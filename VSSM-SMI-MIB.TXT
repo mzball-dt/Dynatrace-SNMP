@@ -1,0 +1,1290 @@
+-- *****************************************************************
+-- VSSM-SMI-MIB.txt:  VSS Monitoring, Inc. Enterprise
+--                    Structure of Management Information
+--
+-- April 2014
+--
+-- Copyright (c) 2003 - 2014 VSS Monitoring, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+VSSM-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        IpAddress,
+        enterprises,
+        Integer32,
+        Counter32
+            FROM SNMPv2-SMI
+
+        DisplayString
+            FROM SNMPv2-TC
+
+        NOTIFICATION-GROUP,
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE
+            FROM SNMPv2-CONF;
+
+vssMonitoring MODULE-IDENTITY
+    LAST-UPDATED "201404100000Z"
+    ORGANIZATION "VSS monitoring, Inc."
+    CONTACT-INFO
+        "    VSS Monitoring
+
+        Postal: 930 DeGuigne Drive,
+                Sunnyvale, CA 94085
+                USA
+
+           Tel: +1 (408) 585-6800
+
+        E-mail: Tsupport@vssmonitoring.com"
+
+    DESCRIPTION
+        "The Structure of Management Information for the VSS enterprise.
+
+         The VSSM-SMI-MIB is used by all VSS products implementing the 
+         SNMP management interface with the VSS Dual Interface Management
+         Module (vDIMM).
+        "
+
+    --  Revision history
+     REVISION     "201404100000Z"         -- 10 April 2014
+     DESCRIPTION
+        "Version 3.4 of VSSM-SMI-MIB:
+            - Fixed SMIv2 MIB compliance.
+        "
+
+    --  Revision history
+     REVISION     "201403030000Z"         -- 3 March 2014
+     DESCRIPTION
+        "Version 3.4 of VSSM-SMI-MIB:
+            - Edited  moduleStatus.
+        "
+
+     REVISION     "201402280000Z"         -- 28 February 2014
+     DESCRIPTION
+        "Version 3.4 of VSSM-SMI-MIB:
+            - Added  moduleStatusInfo and moduleStatus.
+            - Obsoleted: moduleRemovalInfo and moduleRemovalStatus.
+        "
+
+    --  Revision history
+     REVISION     "201402040000Z"         -- 4 February 2014
+     DESCRIPTION
+        "Version 3.4 of VSSM-SMI-MIB:
+            - Added vssNetworkActivityStatsObjects.
+        "
+
+    --  Revision history
+     REVISION     "201312170000Z"         -- 17 December 2013
+     DESCRIPTION
+        "Version 3.3 of VSSM-SMI-MIB:
+            - Added  encapSettingsConfig and toolChainsConfig entries to the configChangeType object type.
+        "
+
+    --  Revision history
+     REVISION     "201305070000Z"         -- 07 May 2013
+     DESCRIPTION
+        "Version 3.2 of VSSM-SMI-MIB:
+            - Added  systemName Object type under vssMonitoringNotificationInfo object.
+            - Updated a 'heartbeat' Notification with systemName object.
+        "
+        
+    --  Revision history
+     REVISION     "201303150000Z"         -- 15 March 2013
+     DESCRIPTION
+        "Version 3.1 of VSSM-SMI-MIB:
+            - Added  moduleID, moduleRemovalStatus Object types under vssMonitoringNotificationInfo object.
+            - Added a new Notification for moduleRemovalInfo with moduleID, moduleRemovalStatus objects.
+        "
+
+    --  Revision history
+     REVISION     "201212180000Z"         -- 18 Dec 2012
+     DESCRIPTION
+        "Version 3.1 of VSSM-SMI-MIB:
+             - Added identity, lbToken, softwareVersion, ingressPortIDsTimestamped, egressPortIDsMetadata object types under vssMonitoringNotificationInfo object
+             - Added new notification for heartbeat with identity, lbToken, softwareVersion, ingressPortIDsTimestamped, egressPortIDsMetadata objects.
+        "
+
+    --  Revision history
+     REVISION     "201207190000Z"         -- 19 July 2012
+     DESCRIPTION
+        "Version 3.0 of VSSM-SMI-MIB:
+             - Added  partnerPortIDNotification, partnerIPNotification, linkStateChangeNotification Object types under vssMonitoringNotificationInfo object.
+            - Added a new Notification for vstack, vStackLinkState with portIDNotification,  partnerPortIDNotification, partnerIPNotification, linkStateChangeNotification Objects.
+        "
+
+    --  Revision history
+
+     REVISION     "201204170000Z"         -- 17 April 2012
+     DESCRIPTION
+        "Version 2.6 of VSSM-SMI-MIB:
+             - Added  idInformation Object type under vssMonitoringNotificationInfo object.
+             - Added  idInformation, userNameNotification, userIpAddress, loginAccessType Objects to systemConfigChange Notification.
+        "
+
+     REVISION     "201203190000Z"         -- 19 March 2012
+     DESCRIPTION
+        "Version 2.5 of VSSM-SMI-MIB:
+             - Updated configChangeType Object type with filterAndBypassSettingsConfig, triggerConfig, mplsSettingsConfig, and vsliceSettingsConfig.
+             - Added  filterNotification Object type under vssMonitoringNotificationInfo object.
+        "
+
+     REVISION     "201108040000Z"         -- 04 August 2011
+     DESCRIPTION
+        "Version 2.4 of VSSM-SMI-MIB:
+             - Modified copyright statement of the MIB to include 2011.
+             - Updated the portClass Object type with networkBypass, bypassMonitor and servicePort.
+        "
+
+     REVISION     "201104270000Z"         -- 27 April 2011
+     DESCRIPTION
+        "Version 2.3 of VSSM-SMI-MIB:
+             - Updated VSS Monitoring's with new trigger trap notifications.
+        "
+
+     REVISION     "201104040000Z"         -- 4 April 2011
+     DESCRIPTION
+        "Version 2.2 of VSSM-SMI-MIB:
+             - Updated configChangeType oid to add loadBalancingGroupConfig enumeration type.
+        "
+
+     REVISION     "201012200000Z"         -- 20 December 2010
+     DESCRIPTION
+        "Version 2.1 of VSSM-SMI-MIB:
+             - Updated VSS Monitoring's postal and email addresses.
+        "
+        
+     REVISION      "201006230000Z"        -- 10 June 2010
+     DESCRIPTION
+        "Changed portClass, portState, portSpeed, portDuplex, portError syntax
+         in portEntry SEQUENCE to INTEGER instead of Integer32."
+         
+     REVISION     "200908010000Z"         -- 01 August 2009
+     DESCRIPTION
+        "Version 2.0 of VSSM-SMI-MIB:
+             - Changed the structure of the MIB compared to previous
+               releases.  We have added a level to better group the
+               managed objects.
+             - Minor changes to interpretation of a few objects, changed
+               the name of one OID to better convey its use.
+             - Added vssMonitoringProductsIDs, which we are returning as the
+               sysObjectID.  This OID does not yet have any object-specific
+               info.  It does NOT change any previous object IDs in this MIB.
+             - Minor changes to the descriptions of objects in this MIB.
+        "
+    REVISION      "200907150000Z"
+    DESCRIPTION
+        "The Structure of Management Information for the VSS enterprise."
+    REVISION      "200903030000Z"
+    DESCRIPTION
+        "Initial Release"
+    ::= { enterprises 21671 }
+
+vssMonitoringProducts OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "vssMonitoringProducts is the root OBJECT IDENTIFIER from
+        which product-specific values are assigned."
+    ::= { vssMonitoring 1 }
+
+vssMonitoringExperiments OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "vssExperiments provides a root object identifier
+        from which experimental & demo mibs are created."
+    ::= { vssMonitoring 2 }
+
+vssMonitoringNotification OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "vssMonitoringNotification is a definition of notifications
+        for VSS Monitoring's newer products.  Particular products may
+        implement and use a subset of these Notifications."
+    ::= { vssMonitoring 3 }
+
+vssMonitoringObjects OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "vssMonitoringObjects is a definition of get/set objects .
+        Particular products may implement and use a subset of these
+        objects."
+    ::= { vssMonitoring 4 }
+
+vssMonitoringNotificationInfo OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "vssMonitoringInfo is the base for objects providing information
+        in notifications."
+    ::= { vssMonitoring 5 }
+
+vssMonitoringCompliances OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "vssMonitoringNotification is the base for module compliance
+        definitions."
+    ::= { vssMonitoring 6 }
+
+-- --------------------------------------------------------------------
+--
+-- The following 'objects' are used in notifications.  They have no
+-- independent status, and are not associated with any system variables
+-- except during a notification.  Thus, reading them does not produce
+-- useful information.
+
+portIDNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique ID for each port.  IDs match the port labels on the
+         faceplate of the device.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 1 }
+
+portStateNotification OBJECT-TYPE
+    SYNTAX      INTEGER {
+        down(0),
+        up(1),
+        linkSafeDisabled(2),
+        relinking(3),
+        linkSafeOK(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Indicates link status of the port.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 2 }
+
+userNameNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Name of the user for log-in, log-out, log-failure events.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 3 }
+
+userIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address of the system from which a user accesses this box.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 4 }
+
+configChangeType OBJECT-TYPE
+    SYNTAX      INTEGER{
+        systemConfig(1),
+        snmpConfig(2),
+        portConfig(3),
+        accessConfig(4),
+        filterLibraryConfig(5),
+        filterAndMonitorSettingsConfig(6),
+        systemSoftwareConfig(7),
+        loadBalancingGroupConfig(8),
+        filterAndBypassSettingsConfig(9),
+        triggerConfig(10),
+        mplsSettingsConfig(11),
+        vsliceSettingsConfig(12),
+        encapSettingsConfig(13),
+        toolChainsConfig(14),
+	vsliceFilterLibraryConfig(15)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates which configuration group was changed.
+         Reading this value will not return meaningful information, as it
+         is not bound to any value value except during the associated
+         notification."
+    ::= { vssMonitoringNotificationInfo 5 }
+
+loginAccessType OBJECT-TYPE
+    SYNTAX      INTEGER{
+        serialAccess(1),
+        telnetAccess(2),
+        sshAaccess(3),
+        snmpAccess(4),
+        httpAccess(5),
+        shttpAccess(6),
+        frontPanelAccess(8),
+        ftpAccess(9),
+        sftpAccess(10)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates which access method was used in the login.
+         Reading this value will not return meaningful information, as it
+         is not bound to any value except during the associated notification.
+         "
+    ::= { vssMonitoringNotificationInfo 6 }
+
+triggerInformation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Name of the trigger plus extra information regarding what trigger
+	 happened."
+    ::= { vssMonitoringNotificationInfo 7 }
+
+filterNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique filterName for each filter."
+    ::= { vssMonitoringNotificationInfo 8 }
+
+idInformation OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (80))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Defines the Id of the object changed in configChangeType. This is used in conjunction with the systemConfigChange Notification.
+    configChange Type                        idInformation
+    ------------------------                         -------------------
+        snmpConfig                                    NULL
+        portConfig                                      portIDNotification
+        accessConfig                                   NULL
+        filterLibraryConfig                         filterNotification
+        filterAndMonitorSettingsConfig     NULL
+        systemSoftwareConfig                    NULL
+        loadBalancingGroupConfig            NULL
+        filterAndBypassSettingsConfig       NULL
+        triggerConfig                                 triggerInformation
+         mplsSettingsConfig                       NULL
+         vsliceSettingsConfig                      NULL
+	 vsliceFilterLibraryConfig		filterNotification"
+      ::= { vssMonitoringNotificationInfo 9}
+
+partnerIPNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the node's partner connected via vStack protocol.  
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 10 }
+
+partnerPortIDNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID for port's partner port connected via vStack protocol.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 11 }
+
+linkStateChangeNotification OBJECT-TYPE
+    SYNTAX      INTEGER {
+        down(0),
+        up(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the change of link status of the vstack connection.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 12 }
+
+identity OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Identity/Unit ID of this node."
+    ::= { vssMonitoringNotificationInfo 14 }
+
+lbToken OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "LB token for this node."
+    ::= { vssMonitoringNotificationInfo 15 }
+
+softwareVersion OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (32))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Software version installed on this node."
+    ::= { vssMonitoringNotificationInfo 16 }
+
+ingressPortIDsTimestamped OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (512))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A list of ingress port IDs on this node designated to be time-stamped."
+    ::= { vssMonitoringNotificationInfo 17 }
+
+egressPortIDsMetadata OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (512))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A list of egress port IDs on this node designated to have TekComms metadata added."
+    ::= { vssMonitoringNotificationInfo 18 }
+
+moduleID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique module ID.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 19 }
+
+moduleRemovalStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "A module removal status.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 20 }
+
+systemName OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "System name of this node."
+    ::= { vssMonitoringNotificationInfo 21 }
+
+moduleStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        moduleInserted(1),
+        moduleRemoved(2),
+        moduleConfigurationRemovalInitiated(3), 
+        moduleConfigurationRemovalCanceled(4),
+        moduleConfigurationRemoved(5) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A module removal status.
+         Reading this value will not return meaningful information, as it is
+         not bound to any value except during the associated notification."
+    ::= { vssMonitoringNotificationInfo 22 }
+
+
+-- --------------------------------------------------------------------------
+--
+-- Notifications
+--
+-- --------------------------------------------------------------------------
+
+vssNotifications OBJECT-IDENTITY
+     STATUS      current
+     DESCRIPTION
+             "vssNotifications is a 'zero' node to hold all of the
+             notifications.  This is required for translation to SNMPv1 traps."
+     ::= { vssMonitoringNotification 0 }
+ 
+systemConfigChange NOTIFICATION-TYPE
+    OBJECTS { configChangeType, idInformation, userNameNotification, userIpAddress, loginAccessType }
+     STATUS      current
+     DESCRIPTION
+         "One or more system configuration settings have been changed."
+     ::= { vssNotifications 1 }
+ 
+consoleLogin NOTIFICATION-TYPE
+    OBJECTS { userNameNotification, userIpAddress, loginAccessType }
+    STATUS      current
+    DESCRIPTION
+        "A user has logged-in to the system console."
+    ::= { vssNotifications 2 }
+ 
+consoleLogout NOTIFICATION-TYPE
+    OBJECTS { userNameNotification, userIpAddress, loginAccessType }
+    STATUS      current
+    DESCRIPTION
+        "A user has logged-out from the system console."
+    ::= { vssNotifications 3 }
+ 
+consoleAuthFailed NOTIFICATION-TYPE
+    OBJECTS { userNameNotification, userIpAddress, loginAccessType }
+    STATUS      current
+    DESCRIPTION
+        "Authentication failure: a user has attempted to log-in to the system
+        console, but failed due to unrecognized username and/or password."
+    ::= { vssNotifications 4 }
+ 
+portLinkUp NOTIFICATION-TYPE
+     OBJECTS { portIDNotification, portStateNotification }
+     STATUS      current
+     DESCRIPTION
+         "A port has come online (changed state from link-down to link-up).
+          The port is identified by the portID.
+          The port state is identified by the included portStateNotification object."
+     ::= { vssNotifications 5 }
+ 
+portLinkDown NOTIFICATION-TYPE
+     OBJECTS
+         { portIDNotification, portStateNotification }
+     STATUS      current
+     DESCRIPTION
+         "A port has gone offline (changed state from link-up to link-down).
+          The port is identified by the portID.
+          The port state is identified by the included portLinkNotification object."
+     ::= { vssNotifications 6 }
+ 
+powerSupplyOneError NOTIFICATION-TYPE
+     STATUS      current
+     DESCRIPTION
+         "The voltage from Main Power Supply #1 is zero or below normal.
+          Either the power supply has failed, or the AC source to the
+          power supply has failed or the AC cable is disconnected."
+     ::= { vssNotifications 7 }
+ 
+powerSupplyOneOk NOTIFICATION-TYPE
+     STATUS      current
+     DESCRIPTION
+         "The voltage from Main Power Supply #1 has returned to normal."
+     ::= { vssNotifications 8 }
+ 
+powerSupplyTwoError NOTIFICATION-TYPE
+     STATUS      current
+     DESCRIPTION
+         "The voltage from Main Power Supply #2 is zero or below normal.
+          Either the power supply has failed, or the AC source to the
+          power supply has failed or the AC cable is disconnected."
+     ::= { vssNotifications 9 }
+ 
+powerSupplyTwoOk NOTIFICATION-TYPE
+     STATUS      current
+     DESCRIPTION
+         "The voltage from Main Power Supply #2 has returned to normal."
+     ::= { vssNotifications 10 }
+ 
+temperatureError NOTIFICATION-TYPE
+     STATUS      current
+     DESCRIPTION
+         "The internal temperature is higher than normal.
+          Either one or more chassis fan(s) has failed, or fan(s) are blocked,
+          or the unit is in a hot enclosed chamber, or in a hot environment."
+     ::= { vssNotifications 11 }
+ 
+temperatureOk NOTIFICATION-TYPE
+     STATUS      current
+     DESCRIPTION
+         "The internal temperature has returned to normal."
+     ::= { vssNotifications 12 }
+ 
+triggerNotify NOTIFICATION-TYPE
+     OBJECTS { triggerInformation }
+     STATUS      current
+     DESCRIPTION
+         "This is when trigger condition changes to True/Active or False/Inactive."
+     ::= { vssNotifications 15 }
+
+vStackLinkState NOTIFICATION-TYPE
+     OBJECTS { portIDNotification, partnerIPNotification,  partnerPortIDNotification, linkStateChangeNotification }
+     STATUS      current
+     DESCRIPTION
+          "The vStack link has gone Up/Down. 
+           The current Node's portId is identified by the portIDNotification object.
+           The partner Node's IP address is identified by the partnerIPNotification object. 
+           The partner Node's portId is identified by the partnerPortIDNotification object.
+           The link state of the vstack link between the two nodes is identified by the linkStateChangeNotification object as (Up/Down)."
+     ::= { vssNotifications 16 }
+
+heartbeat NOTIFICATION-TYPE
+     OBJECTS { identity, lbToken, softwareVersion, ingressPortIDsTimestamped, egressPortIDsMetadata, systemName }
+     STATUS      current
+     DESCRIPTION
+          "The heartbeat sent periodically to the NMS.
+           The identity is identified by the identity object.
+           The LB token is identified by the lbToken object.
+           The software version is identified by the softwareVersion object.
+           The list of ingress port IDs, designated to be time-stamped, is identified by the ingressPortIDsTimestamped object.
+           The list of egress port IDs, designated to have TekComms metadata added, is identified by the egressPortIDsMetadata object.
+           The systemName is the name of the system."
+     ::= { vssNotifications 17 }
+
+moduleRemovalInfo NOTIFICATION-TYPE
+     OBJECTS { moduleID, moduleRemovalStatus }
+     STATUS      current
+     DESCRIPTION
+          "This notification is sent whenever a user changes the module removal status either to 'remove' or 'cancel removal'.
+           The moduleID is identified by the moduleID object.
+           The moduleRemovalStatus is identified by the moduleRemovalStatus object."
+     ::= { vssNotifications 18 }
+
+moduleStatusInfo NOTIFICATION-TYPE
+     OBJECTS { moduleID, moduleStatus, userNameNotification, userIpAddress, loginAccessType }
+     STATUS      current
+     DESCRIPTION
+          "This notification is sent whenever a module inserted/removed to/from any modular platform.
+           The moduleID is identified by the moduleID object."
+     ::= { vssNotifications 19 }
+
+-- --------------------------------------------------------------------------
+--
+-- vssMonitoring objects
+--
+-- --------------------------------------------------------------------------
+
+vssMonitoringProductsIDs OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        "vssMonitoringProductsIDs is the root OBJECT IDENTIFIER from
+        which product-specific sysObjectID values are assigned."
+    ::= { vssMonitoringProducts 2 }
+
+vssSystemObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Contains information about the system"
+    ::= { vssMonitoringObjects 1 }
+
+vssHardwareObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Contains information about the hardware for the unit"
+    ::= { vssMonitoringObjects 2 }
+
+vssPortObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Contains information about ports"
+    ::= { vssMonitoringObjects 3 }
+
+vssFilterObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Contains information related to filters"
+    ::= { vssMonitoringObjects 4 }
+
+vssAccessControlObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Contains information related to access control"
+    ::= { vssMonitoringObjects 5 }
+
+vssNetworkActivityStatsObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Contains information about ports network activirt"
+    ::= { vssMonitoringObjects 6 }
+
+productID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (25))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Product identifier of this device."
+    ::= { vssSystemObjects 1 }
+
+productVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (10))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+                "Product software version."
+    ::= { vssSystemObjects 2 }
+
+accessOverrideTimer OBJECT-TYPE
+    SYNTAX     Integer32 (-1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Temporary access control override timer:
+            1+ = Number of temporary access override seconds remaining.
+            <1 = No current override in effect."
+    ::= { vssSystemObjects 3 }
+
+numberOfPorts    OBJECT-TYPE
+    SYNTAX     Integer32(0..256)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of ports on this device."
+    DEFVAL{ 16 }
+    ::= { vssHardwareObjects 1 }
+
+chassisTemperature OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inRange(1),
+                    outOfRange(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicator of the internal chassis temperature of the unit"
+    ::= { vssHardwareObjects 2 }
+
+coreTemperature OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inRange(1),
+                    outOfRange(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicator of the core IC temperature of the unit: inRange or
+        outOfRange"
+    ::= { vssHardwareObjects 3 }
+
+numberOfPowerSupplies    OBJECT-TYPE
+    SYNTAX     Integer32(1..2)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of power supplies in this device."
+    DEFVAL{ 2 }
+    ::= { vssHardwareObjects 4 }
+
+powerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row for each power supply."
+    ::= { vssHardwareObjects 5 }
+
+powerSupplyTableEntry OBJECT-TYPE
+    SYNTAX      PowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A powerSupplyTableEntry contains information about one power supply"
+    INDEX { powerSupplyIndex }
+    ::= { powerSupplyTable 1 }
+
+PowerSupplyEntry ::= SEQUENCE {
+    powerSupplyIndex        Integer32,
+    powerSupplyVoltage      INTEGER
+}
+
+powerSupplyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index for each powerSupplyVoltageTable row."
+    ::= { powerSupplyTableEntry 1 }
+ 
+powerSupplyVoltage OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inRange(1),
+                    outOfRange(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicator of voltage from a power supply: inRange or outOfRange."
+    ::= { powerSupplyTableEntry 2 }
+
+systemReset OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Writing any non-zero value causes the system to be reset.
+        This value will always produce zero on read."
+    ::= { vssHardwareObjects 6 }
+
+
+portTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row for each port. The number of
+        entries in this table is determined by the value
+        of the 'ports' object."
+    ::= { vssPortObjects 1 }
+
+portTableEntry OBJECT-TYPE
+    SYNTAX      PortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A portTableEntry contains information about one port."
+    INDEX   { portIndex }
+    ::= { portTable 1 }
+
+PortEntry ::= SEQUENCE {
+    portIndex           Integer32,
+    portID              DisplayString,
+    portName            DisplayString,
+    portClass           INTEGER,
+    portState           INTEGER,
+    portSpeed           INTEGER,
+    portDuplex          INTEGER,
+    portError           INTEGER
+    }
+
+portIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index for each portTable row."
+    ::= { portTableEntry 1 }
+
+portID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique ID for each port.  IDs match the port labels on the
+        faceplate of the device.
+        Pairs of Network ports are labeled A and B."
+    ::= { portTableEntry 2 }
+
+portName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A textual string containing the name assigned to the port.
+        An empty string indicates that no name has been assigned." 
+    ::= { portTableEntry 3 }
+
+portClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    monitor(1),
+                    tap(2),
+                    span(3),
+		    networkBypass(4),
+ 		    bypassMonitor(5),
+		    vStack(6),
+                    servicePort(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "port class: Network ports can be Tap or Span;
+        Monitor ports are always Monitor; Input/Output ports 
+        can be either Tap, Span or Monitor, or vStack. networkBypass 
+        and bypassMonitor classes are supported on protector type  
+        devices. servicePort is the port class that provides services 
+        to other ports."
+    ::= { portTableEntry 4 }
+
+portState OBJECT-TYPE
+    SYNTAX      INTEGER {
+            down(0),
+            up(1),
+            linkSafeDisabled(2),
+            relinking(3),
+            linkSafeOK(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates link status of the port."
+    ::= { portTableEntry 5 }
+
+portSpeed OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    speed10(0),
+                    speed100(1),
+                    speed1000(2),
+                    speed10000(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates current port link speed.  Might not be valid if
+        the link is not in the UP state."
+    ::= { portTableEntry 6 }
+
+portDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    duplexHalf(0),
+                    duplexFull(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current duplex of the link.  Might not be valid if
+        the link is not in the UP state."
+    ::= { portTableEntry 7 }  
+
+portError OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noError(0),
+                    speedError(1),
+                    duplexError(2),
+                    auxPortError(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current error status of the link."
+    ::= { portTableEntry 8 }  
+
+------------------------------------------
+vssNetworkActivityStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NetworkActivityStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row for each port. The number of
+        entries in this table is determined by the value
+        of the 'network activity' object."
+    ::= { vssNetworkActivityStatsObjects 1 }
+
+vssNetworkActivityStatsTableEntry OBJECT-TYPE
+    SYNTAX      NetworkActivityStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A vssNetworkActivityStatsTableEntry contains information about one port network activity."
+    INDEX   { naPortIndex }
+    ::= { vssNetworkActivityStatsTable 1 }
+
+NetworkActivityStatsEntry ::= SEQUENCE {
+    naPortIndex         Integer32,
+    naPortID            DisplayString,
+    naRxThroughput      DisplayString,
+    naTxThroughput      DisplayString,
+    naPeakRxThroughput  DisplayString,
+    naPeakTxThroughput  DisplayString,
+    naRxUtilization     DisplayString,
+    naTxUtilization     DisplayString,
+    naPeakRxUtilization DisplayString,
+    naPeakTxUtilization DisplayString,
+    naGoodPacketsRx     Counter32,
+    naGoodPacketsTx     Counter32,
+    naBadPacketsRx      Counter32,
+    naBadPacketsTx      Counter32,
+    naCrcErrorsRx       Counter32,
+    naCrcErrorsTx       Counter32,
+    naMulticastsRx      Counter32,
+    naMulticastsTx      Counter32,
+    naUnicastsRx        Counter32,
+    naUnicastsTx        Counter32,
+    naOverflowDropsRx   Counter32,
+    naOverflowDropsTx   Counter32
+    }
+
+naPortIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index for each portTable row."
+    ::= { vssNetworkActivityStatsTableEntry 1 }
+
+naPortID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique ID for each port.  IDs match the port labels on the
+        faceplate of the device.
+        Pairs of Network ports are labeled A and B."
+    ::= { vssNetworkActivityStatsTableEntry 2 }
+
+naRxThroughput OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx throughput (Mbps)." 
+    ::= { vssNetworkActivityStatsTableEntry 3 }
+
+naTxThroughput OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx throughput (Mbps)." 
+    ::= { vssNetworkActivityStatsTableEntry 4 }
+
+naPeakRxThroughput OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx throughput (Mbps)." 
+    ::= { vssNetworkActivityStatsTableEntry 5 }
+
+naPeakTxThroughput OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx throughput (Mbps)." 
+    ::= { vssNetworkActivityStatsTableEntry 6 }
+
+naRxUtilization OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Utilization (%)." 
+    ::= { vssNetworkActivityStatsTableEntry 7 }
+
+naTxUtilization OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Utilization (%)." 
+    ::= { vssNetworkActivityStatsTableEntry 8 }
+
+naPeakRxUtilization OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak Rx Utilization (%)." 
+    ::= { vssNetworkActivityStatsTableEntry 9 }
+
+naPeakTxUtilization OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak Tx Utilization (%)." 
+    ::= { vssNetworkActivityStatsTableEntry 10 }
+
+naGoodPacketsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of good Rx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 11 }
+
+naGoodPacketsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of good Tx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 12 }
+
+naBadPacketsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bad Rx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 13 }
+
+naBadPacketsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bad Tx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 14 }
+
+naCrcErrorsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Rx packets with CRC erros." 
+    ::= { vssNetworkActivityStatsTableEntry 15 }
+
+naCrcErrorsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Tx packets with CRC erros." 
+    ::= { vssNetworkActivityStatsTableEntry 16 }
+
+naMulticastsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicats Rx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 17 }
+
+naMulticastsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicats Tx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 18 }
+
+naUnicastsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicats Rx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 19 }
+
+naUnicastsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicats Tx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 20 }
+
+naOverflowDropsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overflow drops Rx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 21 }
+
+naOverflowDropsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overflow drops Tx packets." 
+    ::= { vssNetworkActivityStatsTableEntry 22 }
+
+
+-----------------------
+--
+-- Module compliance for VSS-SMI-MIB and this module
+--
+-----------------------
+
+vssMonitoringNotificationInfoGrp OBJECT-GROUP
+    OBJECTS {
+        loginAccessType,
+        portIDNotification,
+        portStateNotification,
+        userNameNotification,
+        userIpAddress,
+        configChangeType,
+triggerInformation,
+filterNotification,
+idInformation,
+partnerIPNotification,
+partnerPortIDNotification,
+linkStateChangeNotification,
+identity,
+lbToken,
+softwareVersion,
+ingressPortIDsTimestamped,
+egressPortIDsMetadata,
+moduleID,
+--moduleRemovalStatus,
+systemName,
+moduleStatus
+    }
+    STATUS current
+    DESCRIPTION "Objects defined in this module"
+    ::= { vssMonitoringCompliances 1 }
+
+vssMonitoringObjectsObjectGroup OBJECT-GROUP
+    OBJECTS {
+        accessOverrideTimer,
+        chassisTemperature,
+        coreTemperature,
+        numberOfPorts,
+        numberOfPowerSupplies,
+        powerSupplyVoltage,
+        portClass,
+        portDuplex,
+        portError,
+        portID,
+        portState,
+        portName,
+        portSpeed,
+        productID,
+        productVersion,
+        systemReset,
+        naPortID,
+        naRxThroughput,
+        naTxThroughput,
+        naPeakRxThroughput,
+        naPeakTxThroughput,
+        naRxUtilization,
+        naTxUtilization,
+        naPeakRxUtilization,
+        naPeakTxUtilization,
+        naGoodPacketsRx,
+        naGoodPacketsTx,
+        naBadPacketsRx,
+        naBadPacketsTx,
+        naCrcErrorsRx,
+        naCrcErrorsTx,
+        naMulticastsRx,
+        naMulticastsTx,
+        naUnicastsRx,
+        naUnicastsTx,
+        naOverflowDropsRx,
+        naOverflowDropsTx
+    }
+    STATUS current
+    DESCRIPTION
+    " VSSMonitoring's objects in this MIB. "
+    ::= { vssMonitoringCompliances 2 }
+
+vssMonitoringNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        consoleAuthFailed,
+        consoleLogin,
+        consoleLogout,
+        portLinkDown,
+        portLinkUp,
+        powerSupplyOneError,
+        powerSupplyOneOk,
+        powerSupplyTwoError,
+        powerSupplyTwoOk,
+        systemConfigChange,
+        temperatureError,
+        temperatureOk,
+        triggerNotify,
+        vStackLinkState,
+        heartbeat,
+        moduleRemovalInfo,
+        moduleStatusInfo
+    }
+    STATUS current
+    DESCRIPTION
+    " vssMonitoringNotificationGroup contains all of the NOTIFICATION objects"
+    ::= { vssMonitoringCompliances 3 }
+ 
+vssMonitoringObsoleteGrp OBJECT-GROUP
+    OBJECTS {
+        moduleRemovalStatus
+    }
+    STATUS obsolete
+    DESCRIPTION "Objects defined in this module"
+    ::= { vssMonitoringCompliances 4 }
+
+
+
+vssMonitoringCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "Compliance for this module"
+    MODULE MANDATORY-GROUPS
+    {
+        vssMonitoringNotificationInfoGrp,
+        vssMonitoringNotificationGroup,
+        vssMonitoringObjectsObjectGroup
+    }
+    ::= { vssMonitoringCompliances 5 }
+        
+
+END
+ --*****************************************************************
