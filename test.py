@@ -10,10 +10,12 @@ from dtsnmp.snmpv2_mib import SNMPv2MIB
 from dtsnmp.f5_bigip_system_mib import F5BigIPSystemMIB
 
 """
-Test script designed to match the flow of custom_snmp_base_plugin_remote.py
+Test script designed to match the flow of custom_snmp_aggregator_plugin_remote.py
 Used to test snmp classes without requiring a build/package of the extension
 Usage python test.py
 """
+
+
 def test_query():
     with open('properties.json') as fp:
         config = json.load(fp)
@@ -29,7 +31,7 @@ def test_query():
     except Exception as e:
         # Just report the pysnmp exception back to the end user
         info = 'Device connection issue: check snmp access'
-        raise Exception('{} - {}'.format(info,str(e))) from e
+        raise Exception('{} - {}'.format(info, str(e))) from e
 
     _display_properties(property_dict)
 
@@ -59,7 +61,8 @@ def test_query():
     mib_list.append(f5_mib)
 
     for mib in mib_list:
-        t = Thread(target=lambda q,mib: q.put(mib.poll_metrics()), args=([metric_queue, mib]))
+        t = Thread(target=lambda q, mib: q.put(
+            mib.poll_metrics()), args=([metric_queue, mib]))
         t.start()
         thread_list.append(t)
 
@@ -68,16 +71,20 @@ def test_query():
 
     _display_metrics(metric_queue)
 
+
 def _display_metrics(metric_queue):
     while not metric_queue.empty():
-        #pprint(metric_queue.get())
-        for endpoint,metrics in metric_queue.get().items():
+        # pprint(metric_queue.get())
+        for endpoint, metrics in metric_queue.get().items():
             for metric in metrics:
-                print('Key = {}, Value = {}, Absolute? = {}, Dimension = {}'.format(endpoint, metric['value'], metric['is_absolute_number'], metric['dimension']))
+                print('Key = {}, Value = {}, Absolute? = {}, Dimension = {}'.format(
+                    endpoint, metric['value'], metric['is_absolute_number'], metric['dimension']))
+
 
 def _display_properties(property_dict):
-    for key,value in property_dict.items():
-        print('key = {}, Value = {}'.format(key,value))
+    for key, value in property_dict.items():
+        print('key = {}, Value = {}'.format(key, value))
+
 
 def _validate_device(config):
     hostname = config.get('hostname')
@@ -100,6 +107,7 @@ def _validate_device(config):
     }
 
     return device
+
 
 def _validate_authentication(config):
     snmp_version = config.get('snmp_version')
@@ -126,6 +134,7 @@ def _validate_authentication(config):
 
     return authentication
 
+
 if __name__ == '__main__':
-    logging.basicConfig(filename='test.log',level=logging.DEBUG)
+    logging.basicConfig(filename='test.log', level=logging.DEBUG)
     test_query()

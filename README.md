@@ -6,6 +6,13 @@
 
 Until this message is cleaned up this repo should be used as-is and considered completely unsupported
 
+    - [ ] Make a new test for if the Devices are online (If the standard test does not work)
+    - [ ] Update plugin.json with new metric outputs
+    - [ ] Pull and report properties from VSS Aggs
+    - [ ] Pull and report time-based metrics from VSS Aggs
+    - [ ] Are the Notification MIB details useful for event creation from these devices?
+        - [ ] Construct Events based on the port open/closed events etc.
+
 ---
 
 A Dynatrace ActiveGate SNMP Polling extension. <br>
