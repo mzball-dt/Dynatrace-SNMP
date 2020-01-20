@@ -8,6 +8,7 @@ from dtsnmp.if_mib import IFMIB
 from dtsnmp.snmpv2_mib import SNMPv2MIB
 from dtsnmp.cisco_process_mib import CiscoProcessMIB
 from dtsnmp.f5_bigip_system_mib import F5BigIPSystemMIB
+from dtsnmp.vss_aggregator_mib import VSSAggregatorMIB
 
 import ruxit.api.selectors
 from ruxit.api.base_plugin import RemoteBasePlugin
@@ -61,6 +62,7 @@ class CustomSnmpAggregatorPluginRemote(RemoteBasePlugin):
         DEVICE_OBJECT_ID = property_dict['sysObjectID']
         F5_OBJECT_ID = '1.3.6.1.4.1.3375'
         CISCO_OBJECT_ID = '1.3.6.1.4.1.9'
+        VSS_PacketBroker_OBJECT_ID = ' 1.3.6.1.4.1.21671'
 
         # HOST METRICS
         if DEVICE_OBJECT_ID.startswith(CISCO_OBJECT_ID):
@@ -71,6 +73,10 @@ class CustomSnmpAggregatorPluginRemote(RemoteBasePlugin):
             # USE F5 BIGIP SYSTEM  MIB FOR F5 devices
             f5_mib = F5BigIPSystemMIB(device, authentication)
             mib_list.append(f5_mib)
+        elif DEVICE_OBJECT_ID.startswith(VSS_PacketBroker_OBJECT_ID):
+            # Use VSS Agg MIB for VSS devices
+            vss_mib = VSSAggregatorMIB(device, authentication)
+            mib_list.append(vss_mib)
         else:
             # HOST RESOURCE MIB - Default fallback
             hr_mib = HostResourceMIB(device, authentication)

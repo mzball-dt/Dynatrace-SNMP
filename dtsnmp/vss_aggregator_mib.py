@@ -13,7 +13,7 @@ class VSSAggregatorMIB():
     Properties from VSSM-SMI-MIB.TXT
 
     Reference
-    http://www.oidview.com/mibs/0/SNMPv2-MIB.html
+    ../VSSM-SMI-MIB.TXT
 
     Usage
     vssagg_mib = VSSAggregatorMIB(device, authentication)
@@ -28,14 +28,12 @@ class VSSAggregatorMIB():
 
     def poll_properties(self):
         mib_properties = [
-            '1.3.6.1.2.1.1.1',  # 'sysDescr',
-            '1.3.6.1.2.1.1.2',  # 'sysObjectID',
-            '1.3.6.1.2.1.1.3',  # 'sysUpTime',
-            '1.3.6.1.2.1.1.4',  # 'sysContact',
-            '1.3.6.1.2.1.1.5', 	# 'sysName',
-            '1.3.6.1.2.1.1.6',  # 'sysLocation',
-            '1.3.6.1.2.1.1.7',  # 'sysServices',
-            '1.3.6.1.2.1.1.8'  # 'sysORLastChange'
+            '1.3.6.1.4.1.21671.4.1.1',  # 'productID',
+            '1.3.6.1.4.1.21671.4.1.2',  # 'productVersion',
+            '1.3.6.1.4.1.21671.4.2.1',  # 'numberOfPorts',
+            '1.3.6.1.4.1.21671.4.2.2',  # 'chassisTemperature',
+            '1.3.6.1.4.1.21671.4.2.3', 	# 'coreTemperature',
+            '1.3.6.1.4.1.21671.4.2.4',  # 'numberOfPowerSupplies'
         ]
         timeout = 2
         retries = 1
@@ -48,12 +46,12 @@ class VSSAggregatorMIB():
             raise Exception('%s at %s' % (errorStatus.prettyPrint(),
                                           errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
         else:
-            get_system_properties(varBinds, props)
+            get_vss_properties(varBinds, props)
 
         return props
 
     def poll_metrics(self):
-        cpu = self._poll_cpu()
+        netActivity = self._poll_NetworkActivityStats()
         storage = self._poll_storage()
 
         cpu_utilisation = cpu.get('cpu', [])
@@ -67,26 +65,44 @@ class VSSAggregatorMIB():
         }
         return metrics
 
-    def _poll_cpu(self):
+    def _poll_NetworkActivityStats(self):
         cpu_metrics = [
-            '1.3.6.1.2.1.25.3.3.1.2'  # hrProcessorLoad
+            ' .1.3.6.1.4.1.21671.4.6.1.1.2',  # naPortID
+            ' .1.3.6.1.4.1.21671.4.6.1.1.3',  # naRxThroughput
+            ' .1.3.6.1.4.1.21671.4.6.1.1.4',  # naTxThroughput
+            ' .1.3.6.1.4.1.21671.4.6.1.1.5',  # naPeakRxThroughput
+            ' .1.3.6.1.4.1.21671.4.6.1.1.6',  # naPeakTxThroughput
+            ' .1.3.6.1.4.1.21671.4.6.1.1.7',  # naRxUtilization
+            ' .1.3.6.1.4.1.21671.4.6.1.1.8',  # naTxUtilization
+            ' .1.3.6.1.4.1.21671.4.6.1.1.11',  # naGoodPacketsRx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.12',  # naGoodPacketsTx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.13',  # naBadPacketsRx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.14',  # naBadPacketsTx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.19',  # naUnicastsRx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.20',  # naUnicastsTx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.21',  # naOverflowDropsRx
+            ' .1.3.6.1.4.1.21671.4.6.1.1.22',  # naOverflowDropsTx
         ]
 
         gen = self.poller.snmp_connect_bulk(cpu_metrics)
-        return process_metrics(gen, calculate_cpu_metrics)
+        return process_metrics(gen, calculate_network_metrics)
 
-    def _poll_storage(self):
+    def _poll_PortStatus(self):
         storage_metrics = [
-            '1.3.6.1.2.1.25.2.3.1.3',  # hrStorageDescr
-            '1.3.6.1.2.1.25.2.3.1.5',  # hrStorageSize
-            '1.3.6.1.2.1.25.2.3.1.6'  # hrStorageUsed
+            '1.3.6.1.4.1.21671.4.3.1.1.2',  # portID
+            '1.3.6.1.4.1.21671.4.3.1.1.3',  # portName
+            '1.3.6.1.4.1.21671.4.3.1.1.4'  # port Class
+            '1.3.6.1.4.1.21671.4.3.1.1.5'  # portState
+            '1.3.6.1.4.1.21671.4.3.1.1.6'  # portSpeed
+            '1.3.6.1.4.1.21671.4.3.1.1.7'  # portDuplex
+            '1.3.6.1.4.1.21671.4.3.1.1.8'  # portError        
         ]
 
         gen = self.poller.snmp_connect_bulk(storage_metrics)
-        return process_metrics(gen, calculate_storage_metrics)
+        return process_metrics(gen, calculate_port_metrics)
 
 
-def calculate_cpu_metrics(varBinds, metrics):
+def calculate_network_metrics(varBinds, metrics):
     """
     Processing Function to be used with processing.process_metrics
     Extracts the CPU utilisation for each index
@@ -100,7 +116,7 @@ def calculate_cpu_metrics(varBinds, metrics):
     metrics.setdefault('cpu', []).append(cpu)
 
 
-def calculate_storage_metrics(varBinds, metrics):
+def calculate_port_metrics(varBinds, metrics):
     """
     Processing Function to be used with processing.process_metrics
     Extracts the storage itilisation - splitting into memory/disk types
@@ -130,7 +146,7 @@ def calculate_storage_metrics(varBinds, metrics):
         metrics.setdefault('disk', []).append(storage)
 
 
-def get_system_properties(varBinds, props):
+def get_vss_properties(varBinds, props):
     """
     sysDescr -> varBinds[0]
     sysObjectID -> varBinds[1]
