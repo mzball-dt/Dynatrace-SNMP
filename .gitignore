@@ -3,5 +3,10 @@
 __pycache__
 dt-snmp-venv/
 dependencies/
-custom_snmp_aggregator_plugin_remote.egg-info/
+custom_snmp_base_plugin_remote.egg-info/
 release
+dtsnmp/bin
+dtsnmp/lib
+dtsnmp/lib64
+dtsnmp/pip-selfcheck.json
+dtsnmp/pyvenv.cfg
